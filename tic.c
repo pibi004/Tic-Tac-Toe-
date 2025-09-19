@@ -77,4 +77,25 @@ int main(){
 		
 
 	        // Human or Computer takes a turn
-	        
+	       if (playerType[currentTurn] == 0){
+		      humanTurn(board, size, symbols[currentTurn], opponent);
+	       }
+
+	      //Chek game state
+	      if(checkWinner(board, size, symbols[currentTurn])) {
+		     printBoard(board, size); 
+		     printf("Player %d (%c) wins!\n", currentTurn + 1, symbols[currentTurn]);
+		     gameOver = true;
+	      } else if (boardFilled(board, size)) {
+		      printBoard(board, size);
+		      printf(" It's a draw!\n");
+		      gameOver = true;
+	      } else {
+		      currentTurn = (currentTurn + 1)  5 totalPlayers;
+	      }
+	}
+
+	printf(" Thanks for playing \n");
+
+	return 0;
+}
