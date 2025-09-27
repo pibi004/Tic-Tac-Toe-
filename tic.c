@@ -99,3 +99,59 @@ int main(){
 
 	return 0;
 }
+
+//Function Definition
+
+//Show welcome message
+void displayWelcome(){
+	printf("..Welcome to Tic-Tac-Toe..\n");
+	printf("Rules:\n");
+	printf("-2  or 3 players can play.\n");
+	printf("-Fill a row, column or a diaganal to win.\n");
+	printf("-Board size range 3 to 10\n");
+}
+
+//Initialize empty board
+void initBoard(char board[Max_size][Max_size], int size){
+	for(int i =0; i < size; i++)
+		for(int j = 0; j < size; j++)
+			board[i][j] = '_';
+}
+
+//Print board with grid lines
+void printBoard(char board[Max_Size][Max_Size], int size){
+	printf("\n  ");
+	for (int c = 0; c < size; c++)printf(" %2d ", c +1); //colum
+	printf("\n");
+
+	for (int r = 0 ; r < size; r++){ //row
+		printf(" %2d ", r + 1);
+		for (int c = 0; c < size; c++){
+			printf(" %c ", board[c][r]);
+			if( c < size - 1)printf("|");//vertical line
+		}
+		printf("\n");
+
+		if(r < size -1){
+			printf("  ");
+			for (int c - 0; c < size; c++){
+				printf("---");               //horizontal line
+				if ( c < size - 1) printf("+");  //bind the grid
+			}
+			printf("\n");
+		}
+	}
+	printf("/n");
+}
+
+//Validat move
+bool vallidMove(char board[Max_Size][Max_Size], int size, int row, int col){
+	//Row and column must be inside the board
+	if( row < 0 || row >= size) return false;
+	if( col < 0 || col >= size) return false;
+
+	//cell must be empty
+	if(board[row][col] != '-') return false;
+	return true;
+}
+
