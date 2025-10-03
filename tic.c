@@ -1,20 +1,18 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
-#include<stdbool.h>
 
 #define Max_Players 3   //Maximum Players can play
-#define Max_Size 10    //Maximum board size
 
 //Function Prototype
 void displayWelcome();
-void initBoard(char board[Max_Size][Max_Size], int size);
-void printBoard(char board[Max_Size][Max_Size], int size);
-bool validMove(char board[Max_Size][Max_Size], int size , int row, int col);
-bool checkWinner(char board[Max_Size][Max_Size], int size, char mark);
-bool boardFilled(char board[Max_Size][Max_Size], int size);
-void humanTurn(char board[Max_Size][Max_Size], int size, char mark);
-void computerTurn(char board[Max_Size][Max_Size],int size, char mark, char opponent);
+void initBoard(char **board, int size);
+void printBoard(char **board, int size);
+bool validMove(char **board, int size , int row, int col);
+bool checkWinner(char **board, int size, char mark);
+bool boardFilled(char **board, int size);
+void humanTurn(char **board ,int size, char mark);
+void computerTurn(char **board,int size, char mark, char opponent);
 int getPlayerType(char symbol);
 
 //Main Function
@@ -22,7 +20,6 @@ int main(){
 	srand((unsigned int)time(NULL));  //Send the random number generator
 					  
 	int size, mode, totalPlayers;
-	char board[Max_Size][Max_Size];   //The game Board
         char symbols[Max_Players] = {'X' , 'O' , 'Z'};
 	int playerType[Max_Players];	// 0 = human  1 = computer
 
@@ -34,6 +31,12 @@ int main(){
 		scanf("%d", &size );
 		if (size >= 3 && <= 10)break;
 		printf("Invalid Board Size. Please Choose betweeen 3 and 10\n");
+	}
+
+	//Allocate memory dynamically for the board
+	char **board = ( char **)malloc(size * sizeof(char *));
+	for (int i = 0; i < size; i++){
+		board[i] = (char *)malloc(size * sizeof(char *));
 	}
 
 	//User choose the game mode to play
@@ -68,7 +71,7 @@ int main(){
 
 	initBoard(board, size); //setup empty board
 	int currentTurn = 0;	//Track current player's turn
-	bool gameOver = false;
+	int gameOver = 0;
 
 	//Game Loop
 	while (!gameOver) {
@@ -78,24 +81,31 @@ int main(){
 
 	        // Human or Computer takes a turn
 	       if (playerType[currentTurn] == 0){
-		      humanTurn(board, size, symbols[currentTurn], opponent);
+		      humanTurn(board, size, symbols[currentTurn]);
+	       }else{
+		       char opponent = symbols[(currentTurn + 1) % totalPlayers];
+		       computerTurn(board, size, symbols[currentTurn], opponent);
 	       }
 
 	      //Chek game state
 	      if(checkWinner(board, size, symbols[currentTurn])) {
 		     printBoard(board, size); 
 		     printf("Player %d (%c) wins!\n", currentTurn + 1, symbols[currentTurn]);
-		     gameOver = true;
+		     gameOver = 1;
 	      } else if (boardFilled(board, size)) {
 		      printBoard(board, size);
 		      printf(" It's a draw!\n");
-		      gameOver = true;
+		      gameOver = 1;
 	      } else {
-		      currentTurn = (currentTurn + 1)  5 totalPlayers;
+		      currentTurn = (currentTurn + 1)  % totalPlayers;
 	      }
 	}
 
-	printf(" Thanks for playing \n");
+	//Free allocated memory
+	for (int i = 0; i < size; i++){
+		free(board[i]);
+	}
+	free(board);
 
 	return 0;
 }
@@ -145,13 +155,74 @@ void printBoard(char board[Max_Size][Max_Size], int size){
 }
 
 //Validat move
-bool vallidMove(char board[Max_Size][Max_Size], int size, int row, int col){
-	//Row and column must be inside the board
-	if( row < 0 || row >= size) return false;
-	if( col < 0 || col >= size) return false;
-
-	//cell must be empty
-	if(board[row][col] != '-') return false;
-	return true;
+int vallidMove(char **board, int size, int row, int col){
+	//Check if row is inside the board
+	if(row < 0 || row >= size)
+		return 0;
+	//Check if column inside the board
+	if( col < 0 || col >= size)
+		return 0;
+	if(board[row][col] != '-')
+		return 0;
+	return 1;
 }
+
+//Check for winner
+int checkWinner(char **board, int size, char mark){
+	//Check Rows
+	for (int r = 0; r < size; r++){
+		int ok = 1;
+		for(int c = 0; c < size; c++){
+			if (board[r][c] != mark){
+				ok = 0;
+				break;
+			}
+		}
+		if (ok) return 1;
+	}
+
+	//Check Colomns
+	for (int c = 0; c < size; c++){
+		int ok = 1;
+		for(int r = 0; r < size; r++){
+			if (board[r][c] != mark){
+				ok = 0;
+			}
+		}
+		if (ok) return 1;
+	}
+
+	//Check main diagnol
+	int ok = 1;
+	for (int i = 0; i < size; i++){
+		if (board[i][i] != mark){
+			ok = 0;
+			break;
+		}
+	}
+	if (ok) return 1;
+
+	//Check anti diagnol
+	ok = 1;
+	for ( int i = 0; i < size; i++){
+		if (board[i][size -1 -i] != mark){
+			ok = 0;
+			break;
+		}
+	}
+	if (ok) return 1;
+
+	return 0;
+}
+
+//Check if board is full
+int boardFilled(char **board, int size){
+	for (int r = 0; r < size; r++)
+		for (int c = 0; c < size; c++)
+			if (board[r][c] == '-') return 0;
+	return 1;
+}
+
+
+
 
