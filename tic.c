@@ -32,23 +32,15 @@ int main(){
 		if (size >= 3 && size <= 10)break;
 		printf("Invalid Board Size. Please Choose betweeen 3 and 10\n");
 	}
-
-	//Allocate memory dynamically for the board
-	char **board = ( char **)malloc(size * sizeof(char *));
-	for (int i = 0; i < size; i++){
-		board[i] = (char *)malloc(size * sizeof(char));
-	}
-
-	//User choose the game mode to play
-	printf("\nGame Modes:\n");
-	printf("1. Player vs Player\n");
-	printf("2. Player vs Computer\n");
-	printf("3. Multi Player( 3 Player )\n");
-
-	while (1) {
-		printf("Select game mode: ");
+	//Game mode
+	while (1){
+		printf("Select mode: \n");
+		printf("1.Human vs Human\n");
+		printf("2.Human vs Computer\n");
+		printf("3.Multi Player(3 Player)\n");
+		printf("Enter option(1 to 3): ");
 		scanf("%d", &mode);
-		if (mode >= 1 && mode <= 3) break;
+		if (mode >= 1 && mode <= 3)break;
 		printf("Invalid option. Choose 1,2 or 3.\n");
 	}
 
@@ -62,12 +54,22 @@ int main(){
 		playerType[0] = 0;  //player is human
 		playerType[1] = 1;  //player is computer
 	} else {
-		totalPlayers = 3;
-		printf("\n Select player types: \n");
-		for (int i = 0; i <3; i++){
+		while (1) {
+			printf("Enter total number of players( 2 or 3): ");
+			scanf("%d", &totalPlayers);
+			if (totalPlayers >= 2 && totalPlayers <= 3)break;
+			printf("Invalid number. Enter 2 or 3.\n");
+		}
+		for (int i = 0; i < totalPlayers; i++){
 			playerType[i] = getPlayerType(symbols[i]);
 		}
 	}
+
+	//Allocated board memory
+	char **board = (char **)malloc(size * sizeof(char *));
+	for (int i = 0; i < size; i++){
+		board[i] = (char *)malloc(size * sizeof(char));
+	} 
 
 	initBoard(board, size); //setup empty board
 	int currentTurn = 0;	//Track current player's turn
@@ -155,7 +157,7 @@ void printBoard(char **board, int size){
 }
 
 //Validat move
-int vallidMove(char **board, int size, int row, int col){
+int validMove(char **board, int size, int row, int col){
 	//Check if row is inside the board
 	if(row < 0 || row >= size)
 		return 0;
@@ -210,9 +212,7 @@ int checkWinner(char **board, int size, char mark){
 			break;
 		}
 	}
-	if (ok) return 1;
-
-	return 0;
+	return ok;
 }
 
 //Check if board is full
@@ -225,7 +225,7 @@ int boardFilled(char **board, int size){
 
 //Human turn
 void humanTurn(char **board, int size, char mark){
-	int r,c;
+	int r, c;
 	while(1) {
 		printf("Enter row and column: ");
 		scanf("%d %d", &r, &c);
