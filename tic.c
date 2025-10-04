@@ -17,8 +17,12 @@ int getPlayerType(char symbol);
 
 //Main Function
 int main(){
-	srand((unsigned int)time(NULL));  //Send the random number generator
-					  
+	srand((unsigned int)time(NULL));//Send the random number generator
+	
+	char playAgain;
+
+	do {
+						  
 	int size, mode, totalPlayers;
         char symbols[Max_Players] = {'X' , 'O' , 'Z'};
 	int playerType[Max_Players];	// 0 = human  1 = computer
@@ -101,6 +105,7 @@ int main(){
 	      } else {
 		      currentTurn = (currentTurn + 1)  % totalPlayers;
 	      }
+	
 	}
 
 	//Free allocated memory
@@ -108,6 +113,12 @@ int main(){
 		free(board[i]);
 	}
 	free(board);
+
+	printf("\nDo you want to play again?(y/n): ");
+	scanf(" %c", &playAgain);
+	} while(playAgain == 'y' || playAgain == 'Y');
+
+	printf("\nThanks for playing!\n");
 
 	return 0;
 }
